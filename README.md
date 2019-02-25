@@ -2,17 +2,17 @@
 
 A drop-in cat replacement written in Rust.
 
-## Disclaimer
+## Disclaimer
 
 This project is purely educationnal and serve as an example for a blog post on [demainilpleut](https://www.demainilpleut.fr/).
 
 It is not mean to be a fully functionnal software and does not come with any guarantees of some sort.
 
-## Prerequisites
+## Prerequisites
 
 This project uses `Rust` and `Cargo`, so make sure that you have the [Rust toolchain](https://rustup.rs/) installed on your environment.
 
-## Installation
+## Installation
 
 ```
 $ cd Development/
@@ -22,7 +22,7 @@ $ cargo build --release
 $ cargo install --path .
 ```
 
-## Usage
+## Usage
 
 ```
 $ kt --help
