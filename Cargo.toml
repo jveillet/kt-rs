@@ -1,0 +1,8 @@
+[package]
+name = "kt"
+version = "0.1.0"
+authors = ["Jeremie Veillet <@jveillet>"]
+edition = "2018"
+
+[dependencies]
+clap = "~2.32"
