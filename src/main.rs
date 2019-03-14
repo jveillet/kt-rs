@@ -3,35 +3,54 @@ extern crate clap;
 use clap::{Arg, App};
 use std::path::Path;
 use std::process;
+use std::io::prelude::*;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{Write};
+use std::io::BufReader;
 
 fn main() {
     let matches = App::new("kt")
       .version("0.1.0")
       .author("Jérémie Veillet. @jveillet")
-      .about("A drop-in cat replacement written in Rust")
+      .about("A drop-in cat replacement written in Rust.")
       .arg(Arg::with_name("FILE")
-            .help("File to print.")
+            .help("Concatenate FILE to standard output")
             .empty_values(false)
         )
-      .get_matches();
+      .arg(Arg::with_name("number")
+            .short("n")
+            .long("number")
+            .help("number all output lines")
+            .takes_value(false)
+            .requires("FILE")
+        )
+    .get_matches();
 
     if let Some(file) = matches.value_of("FILE") {
         if Path::new(&file).exists() {
             match File::open(file) {
-                Ok(mut f) => {
-                    let mut data = String::new();
-                    f.read_to_string(&mut data).expect("[kt Error] Unable to read the  file.");
-                    let stdout = std::io::stdout(); // get the global stdout entity
-                    let mut handle = std::io::BufWriter::new(stdout); // optional: wrap that handle in a buffer
-                    match writeln!(handle, "{}", data) {
-                        Ok(_res) => {},
-                        Err(err) => {
-                            eprintln!("[kt Error] Unable to display the file contents. {:?}", err);
-                            process::exit(1);
-                        },
-                    }
+                Ok(f) => {
+                    let reader = BufReader::new(f);
+                    let mut line_counter = 0;
+                    let stdout = std::io::stdout();
+                    let mut handle = std::io::BufWriter::new(stdout);
+                    for line in reader.lines() {
+                        line_counter += 1;
+                        if matches.is_present("number") {
+                            writeln!(handle, "{} {}", line_counter, line.unwrap()).unwrap_or_else(|err| {
+                                    eprintln!("[kt Error] Unable to display the file contents. {:?}", err);
+                                    process::exit(1);
+                                }
+                            )
+                        }
+                        else {
+                            writeln!(handle, "{}", line.unwrap()).unwrap_or_else(|err| {
+                                    eprintln!("[kt Error] Unable to display the file contents. {:?}", err);
+                                    process::exit(1);
+                                }
+                            )
+                        }
+                    } 
                 }
                 Err(err) => {
                     eprintln!("[kt Error] Unable to read the file. {:?}", err);
